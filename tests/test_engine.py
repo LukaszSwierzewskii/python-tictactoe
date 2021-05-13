@@ -10,6 +10,7 @@ from src.game_engine.board import (
 
 
 class TestBoard:
+    # pylint: disable=no-self-use
     """Unit tests for the board class"""
 
     @pytest.mark.parametrize(
