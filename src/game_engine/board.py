@@ -1,21 +1,22 @@
 """Board module containing board class and it's exceptions, handles the gameboard logic"""
-from numpy import array, int8
+from numpy import array
+from .engine import BaseEngineStatus
 
 
 class Board:
     """Handles the game board"""
 
-    def __init__(self, starting_player):
-        self._board = array([[0] * 3] * 3, dtype=int8)
-        self._has_won = False
-        self._who_won = None
-        self._next_play_by = starting_player
+    def __init__(self):
+        self._players = ("x", "o", " ")
+        self._board = array([[self._players[2]] * 3] * 3, dtype=str)
+        self._next_play_by = "x"
+        self._amount_of_moves_made = 0
 
     def add(self, location, item):
         """Adds and item to the location\n
         location should be an array with two numbers in it (numbers from 0 to 2)
         """
-        if not item is self._next_play_by:
+        if item != self._next_play_by:
             # if for some reason wrong player tries to move raise exception
             raise WrongPlayerException()
         if len(location) < 2:
@@ -28,15 +29,52 @@ class Board:
         ):
             raise OutsideBoardException()  # if outside the playing field raise exception
 
-        if self._board[location] == 0:
-            self._board[location] = item
-        else:
-            # if position is diffrent from 0, it's busy so raise exception
+        if self._board[location] != " ":
+            # if item at location is diffrent from 0 location is busy so we raise exception
             raise PositionTakenException()
+        self._board[location] = item
+        self._amount_of_moves_made += 1
+        if self.run_checks(item):
+            raise PlayerWonStatus(item)
+        self._next_play_by = self._players[self._amount_of_moves_made % 2]
+
+    def run_checks(self, item):
+        """Runs all defined checks and returns True if any of them did"""
+        return self._check_rows_for(item) or (
+            self._check_columns_for(item) or self._check_diagonal_for(item)
+        )
+
+    def _check_rows_for(self, item):
+        """Checks if any row is filled with an item\n
+        returns True if there exists one, False otherwise"""
+        return any((self._board == item).all(1))
+
+    def _check_columns_for(self, item):
+        """Checks if any column is filled with an item\n
+        returns True if there exists one, False otherwise"""
+        return any((self._board.T == item).all(1))
+
+    def _check_diagonal_for(self, item):
+        """Checks if any diagonal is filled with an item\n
+        returns True if there exists one, False otherwise"""
+        return all(self._board.diagonal() == item) or all(
+            self._board[:, ::-1].diagonal() == item
+        )
 
 
 class BoardException(Exception):
     """Base for board class exceptions"""
+
+
+class PlayerWonStatus(BaseEngineStatus):
+    """Signals that a player won"""
+
+    def __init__(self, player):
+        BaseEngineStatus.__init__(self)
+        self.player = player
+
+    def __str__(self):
+        return self.player + " has won the game"
 
 
 class OutsideBoardException(BoardException):
