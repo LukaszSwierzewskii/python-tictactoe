@@ -66,6 +66,12 @@ class Board:
         """Returns copy of the game board"""
         return self._board.copy()
 
+    def clear(self):
+        """Clears entire game board"""
+        self._amount_of_moves_made = 0
+        self._board = self._players[2]
+        self._next_play_by = self._players[0]
+
 
 class BaseEngineStatus(Exception):
     """Base engine status"""

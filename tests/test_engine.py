@@ -1,6 +1,7 @@
 """Module with unit tests for the engine"""
 from contextlib import nullcontext
 import pytest
+from src.game_engine.engine import Engine
 from src.game_engine.board import (
     Board,
     OutsideBoardException,
@@ -95,3 +96,47 @@ class TestBoard:
                 test.add(move, item)
         except PlayerWonStatus as pws:
             assert pws.player is expectation
+
+
+class TestEngine:
+    """Unit test for engine class"""
+
+    # pylint: disable=no-self-use
+    @pytest.mark.parametrize(
+        "move,expectation",
+        [
+            ({"coordinates": (0, 1), "symbol": "x"}, nullcontext()),
+            (
+                {"coordinates": (0, -1), "symbol": "x"},
+                pytest.raises(OutsideBoardException),
+            ),
+            (
+                {"coordinates": (0, 1), "symbol": "o"},
+                pytest.raises(WrongPlayerException),
+            ),
+            (
+                {"coordinates": (1,), "symbol": "x"},
+                pytest.raises(NotEnoughArgumentsException),
+            ),
+        ],
+    )
+    def test_move(self, move, expectation):
+        """Tests if move raises proper exceptions"""
+        instance = Engine()
+        with expectation:
+            assert instance.make_move(move) is None
+
+    def test_win(self):
+        """Tests if winner is reported correctly"""
+        instance = Engine()
+        move_set = (
+            {"coordinates": (0, 1), "symbol": "x"},
+            {"coordinates": (1, 2), "symbol": "o"},
+            {"coordinates": (1, 1), "symbol": "x"},
+            {"coordinates": (0, 2), "symbol": "o"},
+            {"coordinates": (2, 1), "symbol": "x"},
+        )
+        for move in move_set:
+            instance.make_move(move)
+        assert instance.has_won is True
+        assert instance.winner == "x"
