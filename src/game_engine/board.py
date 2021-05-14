@@ -1,6 +1,5 @@
 """Board module containing board class and it's exceptions, handles the gameboard logic"""
 from numpy import array
-from .engine import BaseEngineStatus
 
 
 class Board:
@@ -34,11 +33,13 @@ class Board:
             raise PositionTakenException()
         self._board[location] = item
         self._amount_of_moves_made += 1
-        if self.run_checks(item):
+        if self._run_checks(item):
             raise PlayerWonStatus(item)
+        if self._amount_of_moves_made == 9:
+            raise DrawStatus()
         self._next_play_by = self._players[self._amount_of_moves_made % 2]
 
-    def run_checks(self, item):
+    def _run_checks(self, item):
         """Runs all defined checks and returns True if any of them did"""
         return self._check_rows_for(item) or (
             self._check_columns_for(item) or self._check_diagonal_for(item)
@@ -60,6 +61,18 @@ class Board:
         return all(self._board.diagonal() == item) or all(
             self._board[:, ::-1].diagonal() == item
         )
+
+    def get_copy(self):
+        """Returns copy of the game board"""
+        return self._board.copy()
+
+
+class BaseEngineStatus(Exception):
+    """Base engine status"""
+
+
+class DrawStatus(BaseEngineStatus):
+    """Signals a draw"""
 
 
 class BoardException(Exception):
