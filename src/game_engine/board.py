@@ -1,5 +1,5 @@
 """Board module containing board class and it's exceptions, handles the gameboard logic"""
-from numpy import array
+from numpy import array, dtype
 
 
 class Board:
@@ -7,7 +7,7 @@ class Board:
 
     def __init__(self):
         self._players = ("x", "o", " ")
-        self._board = array([[self._players[2]] * 3] * 3, dtype=str)
+        self._board = array([[self._players[2]] * 3] * 3, dtype=dtype("U1"))
         self._next_play_by = "x"
         self._amount_of_moves_made = 0
 
