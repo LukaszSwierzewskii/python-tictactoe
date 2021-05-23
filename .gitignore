@@ -5,8 +5,13 @@ __pycache__/
 
 # C extensions
 *.so
-
+# file: ~/.gitignore_global
+.DS_Store
+.idea/
+.github/
+.vscode/
 # Distribution / packaging
+
 .Python
 build/
 develop-eggs/
@@ -136,6 +141,3 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-.idea
-.vscode
-.github
