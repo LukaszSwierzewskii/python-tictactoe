@@ -5,13 +5,8 @@ __pycache__/
 
 # C extensions
 *.so
-# file: ~/.gitignore_global
-.DS_Store
-.idea/
-.github/
-.vscode/
-# Distribution / packaging
 
+# Distribution / packaging
 .Python
 build/
 develop-eggs/
